@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { Zap } from 'lucide-react'
 
@@ -51,7 +52,10 @@ export default function Login() {
             </button>
           </form>
         </div>
-        <p style={{ textAlign: 'center', fontSize: 12, color: '#475569', marginTop: 16 }}>Contact your administrator if you need access.</p>
+        <p style={{ textAlign: 'center', fontSize: 13, color: '#475569', marginTop: 16 }}>
+          Don't have an account?{' '}
+          <Link to="/signup" style={{ color: '#3b82f6', textDecoration: 'none', fontWeight: 600 }}>Create one</Link>
+        </p>
       </div>
     </div>
   )
