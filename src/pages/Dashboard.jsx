@@ -1,15 +1,21 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { CheckCircle2, XCircle, UserCheck, Clock, RefreshCw, Activity } from 'lucide-react'
 
-function StatCard({ label, value, color, Icon }) {
+function StatCard({ label, value, color, Icon, onClick }) {
   return (
-    <div className="card" style={{ textAlign: 'center' }}>
+    <div className="card" onClick={onClick}
+      style={{ textAlign: 'center', cursor: onClick ? 'pointer' : 'default', transition: 'transform 0.1s, box-shadow 0.1s' }}
+      onMouseEnter={e => { if (onClick) { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = `0 4px 20px ${color}33` } }}
+      onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = 'none' }}
+    >
       <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 10 }}>
         <Icon size={28} color={color} />
       </div>
       <div style={{ fontSize: 36, fontWeight: 800, color }}>{value}</div>
       <div style={{ fontSize: 13, color: '#64748b', marginTop: 4 }}>{label}</div>
+      {onClick && <div style={{ fontSize: 11, color: '#475569', marginTop: 6 }}>Click to open Operations →</div>}
     </div>
   )
 }
@@ -18,6 +24,7 @@ export default function Dashboard() {
   const [stats, setStats]     = useState({ available: 0, inUse: 0, ready: 0, pending: 0 })
   const [feed, setFeed]       = useState([])
   const [loading, setLoading] = useState(true)
+  const navigate              = useNavigate()
 
   async function load() {
     setLoading(true)
@@ -47,8 +54,8 @@ export default function Dashboard() {
   function timeAgo(date) {
     const diff = Math.floor((Date.now() - new Date(date)) / 1000)
     if (diff < 60) return `${diff}s ago`
-    if (diff < 3600) return `${Math.floor(diff/60)}m ago`
-    return `${Math.floor(diff/3600)}h ago`
+    if (diff < 3600) return `${Math.floor(diff / 60)}m ago`
+    return `${Math.floor(diff / 3600)}h ago`
   }
 
   return (
@@ -62,10 +69,10 @@ export default function Dashboard() {
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 32 }}>
-        <StatCard label="Available Cars"     value={stats.available} color="#4ade80" Icon={CheckCircle2} />
-        <StatCard label="Cars In Use"        value={stats.inUse}     color="#f87171" Icon={XCircle} />
-        <StatCard label="Ready Drivers"      value={stats.ready}     color="#60a5fa" Icon={UserCheck} />
-        <StatCard label="Pending Delegates"  value={stats.pending}   color="#fbbf24" Icon={Clock} />
+        <StatCard label="Available Cars"    value={stats.available} color="#4ade80" Icon={CheckCircle2} onClick={() => navigate('/operations')} />
+        <StatCard label="Cars In Use"       value={stats.inUse}     color="#f87171" Icon={XCircle}      onClick={() => navigate('/operations')} />
+        <StatCard label="Ready Drivers"     value={stats.ready}     color="#60a5fa" Icon={UserCheck}    onClick={() => navigate('/operations')} />
+        <StatCard label="Pending Delegates" value={stats.pending}   color="#fbbf24" Icon={Clock} />
       </div>
 
       <div className="card">
@@ -76,7 +83,10 @@ export default function Dashboard() {
           <div style={{ color: '#475569', padding: '20px 0', textAlign: 'center' }}>Loading...</div>
         ) : feed.length === 0 ? (
           <div style={{ color: '#475569', padding: '20px 0', textAlign: 'center' }}>
-            No sessions yet. Head to Operations to start assigning cars.
+            No sessions yet.{' '}
+            <span onClick={() => navigate('/operations')} style={{ color: '#3b82f6', cursor: 'pointer', fontWeight: 600 }}>
+              Go to Operations →
+            </span>
           </div>
         ) : feed.map(session => (
           <div key={session.id} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '10px 0', borderBottom: '1px solid #1e293b' }}>
